@@ -1,0 +1,58 @@
+version: '3.4'
+
+services:
+
+  api1:
+    image: api1
+    build:
+      context: api1
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3000:3000
+    networks:
+      - mynetwork
+
+  api2:
+    image: api2
+    build:
+      context: api2
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 3001:3000
+    networks:
+      - mynetwork
+    
+  api3:
+    image: api3
+    build:
+      context: api3 
+      dockerfile: ./Dockerfile
+    ports:
+      - 5000:5000
+    networks:
+      - mynetwork
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro  # ใช้ไฟล์ config nginx จากเครื่อง
+      # - ./html:/usr/share/nginx/html:ro       # ไฟล์ HTML หรือ Static file
+      # - ./logs:/var/log/nginx                 # เก็บ log ของ Nginx
+    restart: always
+    depends_on:
+      - api1
+      - api2
+      - api3
+    networks:
+      - mynetwork 
+
+networks:
+  mynetwork:
+    driver: bridge
